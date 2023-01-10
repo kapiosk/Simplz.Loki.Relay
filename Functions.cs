@@ -21,9 +21,10 @@ namespace Simplz.Loki.Relay
             CancellationToken token)
         {
             var Label = "Test";
+            string requestBody = "";
             try
             {
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 var message = System.Text.Json.JsonSerializer.Deserialize<SQSMessage>(requestBody);
 
                 var msg = await MimeMessage.LoadAsync(new MemoryStream(Convert.FromBase64String(message.Content)), token);
@@ -32,7 +33,7 @@ namespace Simplz.Loki.Relay
             catch (Exception ex)
             {
                 Label = "parser";
-                log.LogError(ex, "Error parsing email {Label}", Label);
+                log.LogError(ex, "Error parsing email {Label} {requestBody}", Label, requestBody);
             }
 
             await Task.Delay(100, token);
