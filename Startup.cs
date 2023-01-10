@@ -18,7 +18,9 @@ namespace Simplz.Loki.Relay
             var config = builder.ConfigurationBuilder.Build();
             var dotenv = Path.Combine(Directory.GetCurrentDirectory(), "local.settings.json");
             builder.ConfigurationBuilder.AddJsonFile(dotenv, true);
-            builder.ConfigurationBuilder.AddAzureAppConfiguration(config.GetConnectionString("AppConfig"));
+            var appConfig = config.GetConnectionString("AppConfig");
+            if (!string.IsNullOrEmpty(appConfig))
+                builder.ConfigurationBuilder.AddAzureAppConfiguration(appConfig);
         }
 
         public override void Configure(IFunctionsHostBuilder builder)
