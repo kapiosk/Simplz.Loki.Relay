@@ -9,6 +9,7 @@ using Simplz.Loki.Relay.Models;
 using MimeKit;
 using System.Threading;
 using System;
+using System.Linq;
 
 namespace Simplz.Loki.Relay
 {
@@ -20,7 +21,6 @@ namespace Simplz.Loki.Relay
             ILogger log,
             CancellationToken token)
         {
-            var Label = "Test";
             string requestBody = "";
             try
             {
@@ -28,12 +28,11 @@ namespace Simplz.Loki.Relay
                 var message = System.Text.Json.JsonSerializer.Deserialize<SQSMessage>(requestBody);
 
                 var msg = await MimeMessage.LoadAsync(new MemoryStream(Convert.FromBase64String(message.Content)), token);
-                log.LogError("{HtmlBody} {Label}", msg.HtmlBody ?? msg.TextBody, Label);
+                log.LogWarning("{HtmlBody} {Label} {Name}", msg.HtmlBody ?? msg.TextBody, msg.Subject, msg.To.Mailboxes.FirstOrDefault()?.Address ?? "Anon");
             }
             catch (Exception ex)
             {
-                Label = "parser";
-                log.LogError(ex, "Error parsing email {Label} {requestBody}", Label, requestBody);
+                log.LogError(ex, "Error parsing email {Label} {RequestBody}", "parser", requestBody);
             }
 
             await Task.Delay(100, token);

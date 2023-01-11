@@ -33,7 +33,7 @@ namespace Simplz.Loki.Relay
 
             Log.Logger = new LoggerConfiguration()
                             .MinimumLevel.Fatal()
-                            .MinimumLevel.Override("Function", Serilog.Events.LogEventLevel.Error)
+                            .MinimumLevel.Override("Function", Serilog.Events.LogEventLevel.Warning)
                             //.MinimumLevel.Override("Simplz", Serilog.Events.LogEventLevel.Information)
                             .WriteTo.GrafanaLoki(
                                     grafanaLokiOptions.Uri,
