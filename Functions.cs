@@ -24,9 +24,14 @@ namespace Simplz.Loki.Relay
             {
                 requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 var message = System.Text.Json.JsonSerializer.Deserialize<SQSMessage>(requestBody);
-
                 var msg = await MimeMessage.LoadAsync(new MemoryStream(Convert.FromBase64String(message.Content)));
-                log.LogWarning("{HtmlBody} {Subject} {Name} {ToAddress}", msg.HtmlBody ?? msg.TextBody, msg.Subject, msg.To.Mailboxes.FirstOrDefault()?.Address ?? "Anon");
+                string address = msg.To.Mailboxes.FirstOrDefault(x => x.Address.EndsWith("loggin.belugga.io"))?.Address;
+                if (string.IsNullOrEmpty(address))
+                    address = msg.To.Mailboxes.FirstOrDefault()?.Address;
+                if (string.IsNullOrEmpty(address))
+                    address = "Anon";
+                address = address.Split('@').Last();
+                log.LogWarning("{HtmlBody} {Subject} {ToAddress}", msg.HtmlBody ?? msg.TextBody, msg.Subject, address);
             }
             catch (Exception ex)
             {
